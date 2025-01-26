@@ -1,6 +1,5 @@
-#include "Bank.h"
+#include "../include/Bank.h"
 
-void main(int argc, char* argv[]) {
-    Bank bank(100);
-    
+int main() {
+    Bank bank(1000000);
 }

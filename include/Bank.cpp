@@ -6,22 +6,21 @@ Bank::Bank(size_t size) {
 }
 
 Bank::~Bank() {
-    bank_accounts.remove();
 }
 
 void Bank::insert() {
     bank_accounts.clear();
-    for(int i = 0; i < bank_size; i++) {
-        Account acct;
-        acct.id = i;
-        acct.acct_balance = 0.0;
-        bank_accounts.insert(acct);
+    float total = 0;
+    float default_amount = 100000.00/bank_size;
+    for(size_t i = 0; i < bank_size; i++) {
+        if(i == bank_size - 1)
+            default_amount = 100000.0 - total;
+        bank_accounts.insert(pair<int, float>(i , default_amount));
+        total += default_amount;
     }
-    int total = 10000000;
-    while(total > 0) {
-        int acct_id = rand() % bank_size;
-        float deposit = (rand() % total) / 100.0;
-        total -= deposit;
-        bank_accounts[acct_id].acct_balance += deposit;
+    float count = 0;
+    for(size_t i = 0; i < bank_size; i++) {
+        count += bank_accounts[i];
     }
+    printf("Total: $%.5f\n", count);
 }

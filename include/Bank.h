@@ -1,22 +1,18 @@
 #include <map>
-#include <stdio>
+#include <cstdio>
+#include <random>
 
-#ifdef BANK_H
+#ifndef BANK_H
 #define BANK_H
 
 using namespace std;
 
-struct Account {
-    int id;
-    float acct_balance;
-}
-
 class Bank {
 private:
-    map<Account> bank_accounts;
+    map<int, float> bank_accounts;
     size_t bank_size;
 public:
-    Bank();
+    Bank(size_t size);
     ~Bank();
     void insert();
     void deposit();
