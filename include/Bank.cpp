@@ -18,9 +18,25 @@ void Bank::insert() {
         bank_accounts.insert(pair<int, float>(i , default_amount));
         total += default_amount;
     }
+    printf("Total is %f\n", balance());
+}
+
+void Bank::deposit() {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dis(0, bank_size - 1);
+    int account = dis(gen);
+    int account2 = dis(gen);
+    uniform_real_distribution<> dis2(0, 1000);
+    float amount = (float) dis2(gen);
+    bank_accounts[account] += amount;
+    bank_accounts[account2] -= amount;
+}
+
+float Bank::balance() {
     float count = 0;
     for(size_t i = 0; i < bank_size; i++) {
         count += bank_accounts[i];
     }
-    printf("Total: $%.5f\n", count);
+    return round(count);
 }

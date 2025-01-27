@@ -16,9 +16,7 @@ public:
     ~Bank();
     void insert();
     void deposit();
-    void balance();
-    void do_work();
-    void remove();
+    float balance();
 };
 
 #endif // BANK_H
