@@ -1,6 +1,6 @@
 # C++ compiler flags
 CXX = g++
-CXXFLAGS = -std=c++14 -Wall -Wextra -Werror -pedantic -g
+CXXFLAGS = -std=c++14 -O3 -Wall -Wextra -Werror -pedantic -g -pthread
 
 # Ensure that the out directory is created if it does not exist
 IDIR = ./include
@@ -11,7 +11,7 @@ OUTFOLDER := $(shell mkdir -p $(ODIR))
 IOFILES = $(patsubst %, $(ODIR)/%.o, $(IFILES))
 MAIN_O = $(ODIR)/main.o
 
-all: $(ODIR)/main.exe
+all: $(ODIR)/main.exe $(ODIR)/seq.exe
 
 # Clean all files in the out directory
 clean:
@@ -27,5 +27,10 @@ $(ODIR)/%.o: $(SRC)/%.cpp
 
 # Compile the main executable
 $(ODIR)/main.exe: $(IOFILES) $(MAIN_O) 
+	@echo "Linking $@"
+	$(CXX) -o $@ $^ $(CXXFLAGS)
+
+# Compile the sequential executable
+$(ODIR)/seq.exe:  $(ODIR)/SeqBank.o $(ODIR)/seq.o
 	@echo "Linking $@"
 	$(CXX) -o $@ $^ $(CXXFLAGS)
