@@ -1,6 +1,6 @@
 # C++ compiler flags
 CXX = g++
-CXXFLAGS = -std=c++14 -O3 -Wall -Wextra -Werror -pedantic -g -pthread
+CXXFLAGS = -std=c++17 -O3 -Wall -Wextra -Werror -pedantic -g -pthread
 
 # Ensure that the out directory is created if it does not exist
 IDIR = ./include
@@ -16,6 +16,10 @@ all: $(ODIR)/main.exe $(ODIR)/seq.exe
 # Clean all files in the out directory
 clean:
 	rm -rf $(ODIR)
+
+test: all
+	./$(ODIR)/main.exe $(ARGS)
+	./$(ODIR)/seq.exe $(ARGS)
 
 # Build all C++ object files in the include directory
 $(ODIR)/%.o: $(IDIR)/%.cpp

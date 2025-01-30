@@ -1,11 +1,10 @@
 #include <map>
 #include <random>
 #include <mutex>
+#include <shared_mutex>
 #include <chrono>
-#include <iostream>
 #include <atomic>
-#include <thread>
-#include <condition_variable>
+#include <vector>
 
 #ifndef BANK_H
 #define BANK_H
@@ -14,12 +13,11 @@ using namespace std;
 
 class Bank {
 private:
-    map<int, mutex> locks;
-    map<int, float> bank_accounts;
+    atomic<bool> bal_check; // atomic bool to prevent multiple concurrent balance checks
+    shared_mutex smtx; // shared mutex to lock the lock table
+    map<int, mutex> locks; // map of mutexes to lock each account
+    map<int, float> bank_accounts; // map of account number to balance
     size_t bank_size;
-    atomic<int> num_dep;
-    atomic<int> num_bal;
-    condition_variable cv;
 public:
     Bank(size_t size);
     ~Bank();

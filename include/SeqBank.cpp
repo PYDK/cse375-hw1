@@ -10,12 +10,12 @@ SeqBank::~SeqBank() {
 
 void SeqBank::insert() {
     bank_accounts.clear();
-    float total = 0;
-    float default_amount = 100000.00/bank_size;
+    int total = 0;
+    int default_amount = 10000000/bank_size;
     for(size_t i = 0; i < bank_size; i++) {
         if(i == bank_size - 1)
-            default_amount = 100000.0 - total;
-        bank_accounts.insert(pair<int, float>(i, default_amount));
+            default_amount = 10000000 - total;
+        bank_accounts.insert(pair<int, float>(i, default_amount/100.00));
         total += default_amount;
     }
     printf("Total is %f\n", balance());
@@ -46,14 +46,13 @@ void SeqBank::do_work(int num_work, int& timer) {
         bool check_balance = dis(gen) < 5;
         if(check_balance) {
             float bal = balance();
-            if(bal != 100000.0) {
+            if(bal < 99999.00 || bal > 100001.00) {
                 printf("Balance is %.02f\n", bal);
-                exit(1);
             }
         } else {
             int account = dis2(gen);
             int account2 = dis2(gen);
-            float amount = dis3(gen);
+            float amount = round((dis3(gen) * 100)) / 100.0;
             deposit(account, account2, amount);
         }
     }

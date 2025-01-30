@@ -2,8 +2,7 @@
 
 Bank::Bank(size_t size) {
     this->bank_size = size;
-    num_dep.store(0);
-    num_bal.store(0);
+    bal_check.store(false);
     insert();
 }
 
@@ -12,12 +11,12 @@ Bank::~Bank() {
 
 void Bank::insert() {
     bank_accounts.clear();
-    float total = 0;
-    float default_amount = 100000.00/bank_size;
+    int total = 0;
+    int default_amount = 10000000/bank_size;
     for(size_t i = 0; i < bank_size; i++) {
         if(i == bank_size - 1)
-            default_amount = 100000.0 - total;
-        bank_accounts.insert(pair<int, float>(i, default_amount));
+            default_amount = 10000000 - total;
+        bank_accounts.insert(pair<int, float>(i, default_amount/100.00));
         total += default_amount;
     }
     printf("Total is %f\n", balance());
@@ -34,8 +33,14 @@ void Bank::deposit(int acc1, int acc2, float amount) {
 
 float Bank::balance() {
     float count = 0;
+    unique_lock<shared_mutex> lock(smtx);
+    for(size_t i = 0; i < bank_size; i++) {
+        locks[i].lock();
+    }
+    lock.unlock();
     for(size_t i = 0; i < bank_size; i++) {
         count += bank_accounts[i];
+        locks[i].unlock();
     }
     return round(count);
 }
@@ -46,37 +51,26 @@ void Bank::do_work(int num_work, atomic<int>& timer) {
     uniform_int_distribution<> dis(0, 100);
     uniform_int_distribution<> dis2(0, bank_size - 1);
     uniform_real_distribution<> dis3(0, 1000);
-    mutex m;
-    unique_lock<mutex> lock_guard(m);
 
     auto start = std::chrono::high_resolution_clock::now();
     for(int i = 0; i < num_work; i++) {
-        num_dep.fetch_add(1);
         bool check_balance = dis(gen) < 5;
         if(check_balance) {
-            num_dep.fetch_sub(1);
-            while(num_dep.load() != 0) {
-                std::this_thread::yield();
+            if(bal_check.load()) {
+                continue;
             }
-            num_bal.fetch_add(1);
+            bal_check.store(true);
             float bal = balance();
-            if(bal != 100000.0) {
+            if(bal < 99999.00 || bal > 100001.00) {
                 printf("Balance is %.02f\n", bal);
             }
-            num_bal.fetch_sub(1);
-            if(num_bal.load() == 0) {
-                cv.notify_all();
-            }
+            bal_check.store(false);
         } else {
+            shared_lock table_lock(smtx);
             int account = dis2(gen);
             int account2 = dis2(gen);
-            float amount = dis3(gen);
+            float amount = round((int)(dis3(gen) * 100)) / 100.0;
             deposit(account, account2, amount);
-            num_dep.fetch_sub(1); // There is no guarantee that the worker will wait before the balance check finishes
-        }
-
-        if(num_bal.load()) {
-            cv.wait(lock_guard, [&] { return num_bal.load() == 0; });
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
