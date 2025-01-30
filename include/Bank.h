@@ -16,13 +16,13 @@ private:
     atomic<bool> bal_check; // atomic bool to prevent multiple concurrent balance checks
     shared_mutex smtx; // shared mutex to lock the lock table
     map<int, mutex> locks; // map of mutexes to lock each account
-    map<int, float> bank_accounts; // map of account number to balance
+    map<int, atomic<int>> bank_accounts; // map of account number to balance
     size_t bank_size;
 public:
     Bank(size_t size);
     ~Bank();
     void insert();
-    void deposit(int acc1, int acc2, float amount);
+    void deposit(int acc1, int acc2, int amount);
     float balance();
     void do_work(int num_work, atomic<int>& counter);
 };

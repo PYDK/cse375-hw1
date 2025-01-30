@@ -10,13 +10,13 @@ using namespace std;
 
 class SeqBank {
 private:
-    map<int, float> bank_accounts;
+    map<int, int> bank_accounts; // map of account number to balance
     size_t bank_size;
 public:
     SeqBank(size_t size);
     ~SeqBank();
     void insert();
-    void deposit(int acc1, int acc2, float amount);
+    void deposit(int acc1, int acc2, int amount);
     float balance();
     void do_work(int num_work, int& counter);
 };
